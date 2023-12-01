@@ -1,0 +1,86 @@
+{
+	"backtrace" : 3,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"print_target_properties",
+			"print_target_debug_info"
+		],
+		"files" : 
+		[
+			"contribs/clickhouse-cpp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 132,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 121,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 116,
+				"parent" : 2
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "absl_int128::@7062576131edd5e3179c"
+		}
+	],
+	"id" : "absl__int128_print_debug_info::@54c7e40b0fcb5e65fed3",
+	"name" : "absl__int128_print_debug_info",
+	"paths" : 
+	{
+		"build" : "contribs/clickhouse-cpp",
+		"source" : "contribs/clickhouse-cpp"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 3,
+			"isGenerated" : true,
+			"path" : "build/contribs/clickhouse-cpp/CMakeFiles/absl__int128_print_debug_info",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/contribs/clickhouse-cpp/CMakeFiles/absl__int128_print_debug_info.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

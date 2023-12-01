@@ -1,0 +1,1 @@
+Simple app for testing ClickHouse with GUI(ImGui) for linux
