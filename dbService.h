@@ -23,10 +23,10 @@ public:
 
     void Connect();
     void Reconnect();
-    void CreateTableAndColums();
-    void CreateTableAndColumsWithParamId();
-    void InsertData(float data);
-    void InsertDataWithParamId(float data);
+    void CreateTableAndColums(bool useCompression, int dataType);
+    void CreateTableAndColumsWithParamId(bool useCompression, int dataType);
+    void InsertData(float data, int dataType);
+    void InsertDataWithParamId(float data, int dataType);
     void DropDataBase();
     uint64_t GetRowsCount();
 };

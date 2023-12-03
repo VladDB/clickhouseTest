@@ -21,6 +21,9 @@ private:
     string dbPass = "masterkey";
     string dbName = "test";
     string dbTable = "params";
+    int useCompression = 0;
+    int dataType = 0;
+
     int rndType = 0;
     int paramsCount = 50;
     int dbType = 0;
@@ -54,6 +57,12 @@ public:
 
     void SetParamsCount(int inCount) { this->paramsCount = inCount; }
     int GetParamsCount() const { return this->paramsCount; }
+
+    void SetDataType(int type) { this->dataType = type; }
+    int GetDataType() const { return this->dataType; }
+
+    void SetCompression(int compression) { this->useCompression = compression; }
+    int GetCompression() const { return this->useCompression; }
 
     void SetDbType(int type) { this->dbType = type; }
     int GetDbType() const { return this->dbType; }

@@ -25,7 +25,7 @@ int main(int, char **)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     // Create window with graphics context
-    GLFWwindow *window = glfwCreateWindow(1280, 720, "App for testing ClickHouse", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(1920, 1080, "App for testing ClickHouse", nullptr, nullptr);
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
@@ -73,7 +73,7 @@ int main(int, char **)
 
         ImGui::Begin("Main window", nullptr, window_flags);
         ImGui::SetWindowPos(ImVec2(0, 0));
-        ImGui::SetWindowSize(ImVec2(650, 700));
+        ImGui::SetWindowSize(ImVec2(650, 850));
         // DataBase settings
         {
             ImGui::Text("DataBase settings");
@@ -95,20 +95,19 @@ int main(int, char **)
             ImGui::RadioButton("Wide", &dbType, 0);
             ImGui::RadioButton("Slim", &dbType, 1);
 
-            if (ImGui::Button("Apply connect setting"))
-            {
-                model->SetDbName(dbName);
-                model->SetDbUser(dbUser);
-                model->SetDbPassword(dbPassword);
-                model->SetDbTable(dbTable);
-                model->SetDbType(dbType);
-            }
-        }
+            ImGui::Text("Data type:");
+            static int dbDataType = 0;
+            ImGui::RadioButton("Float", &dbDataType, 0);
+            ImGui::RadioButton("String", &dbDataType, 1);
 
-        ImGui::Separator();
+            ImGui::Text("Use Compression:");
+            static int compression = 0;
+            ImGui::RadioButton("Yes (DoubleDelta and Gorilla)", &compression, 1);
+            ImGui::RadioButton("No", &compression, 0);
 
-        // Test model settings
-        {
+            ImGui::Separator();
+
+            // Test model settings
             ImGui::Text("Test model settings");
 
             ImGui::Text("Settings for generate data (A * sin(F*t))");
@@ -127,8 +126,18 @@ int main(int, char **)
             ImGui::RadioButton("Sin", &rndType, 0);
             ImGui::RadioButton("Saw", &rndType, 1);
 
-            if (ImGui::Button("Apply model setting"))
+            ImGui::Separator();
+
+            if (ImGui::Button("Apply settings"))
             {
+                model->SetDbName(dbName);
+                model->SetDbUser(dbUser);
+                model->SetDbPassword(dbPassword);
+                model->SetDbTable(dbTable);
+                model->SetDbType(dbType);
+                model->SetCompression(compression);
+                model->SetDataType(dbDataType);
+
                 model->SetAmpl(ampl);
                 model->SetFreq(freq);
                 model->SetParamsCount(paramCount);

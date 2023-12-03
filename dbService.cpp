@@ -39,16 +39,27 @@ void DbService::Connect()
     }
 }
 
-void DbService::CreateTableAndColums()
+void DbService::CreateTableAndColums(bool useCompression, int dataType)
 {
     try
     {
         string sqlQuery;
-        sqlQuery = "CREATE TABLE IF NOT EXISTS " + dbName + "." + tableName + " (timestamp DateTime,";
+        sqlQuery = "CREATE TABLE IF NOT EXISTS " + dbName + "." + tableName + " (timestamp DateTime";
+        if (useCompression)
+            sqlQuery.append(" Codec(DoubleDelta, LZ4),");
+        else
+            sqlQuery.append(",");
         for (int i = 0; i < paramsCount; i++)
         {
             sqlQuery.append(" val" + to_string(i));
-            sqlQuery.append(" Float32,");
+            if (dataType == 0)
+                sqlQuery.append(" Float32");
+            else
+                sqlQuery.append(" String");
+            if (useCompression)
+                sqlQuery.append(" Codec(Gorilla, LZ4),");
+            else
+                sqlQuery.append(",");
 
             // add for future request in db
             this->values.push_back("val" + to_string(i));
@@ -70,15 +81,35 @@ void DbService::CreateTableAndColums()
     }
 }
 
-void DbService::CreateTableAndColumsWithParamId()
+void DbService::CreateTableAndColumsWithParamId(bool useCompression, int dataType)
 {
+    string type;
+    if (dataType == 0)
+        type = " Float32";
+    else
+        type = " String";
+
     try
     {
         string sqlQuery;
         sqlQuery = "CREATE TABLE IF NOT EXISTS " + dbName + "." + tableName;
-        sqlQuery.append(" (timestamp DateTime, "
-                        "paramId UInt16, "
-                        "value Float32) ");
+        if (useCompression)
+        {
+            sqlQuery.append(" (timestamp DateTime Codec(DoubleDelta, LZ4), "
+                            "paramId UInt16 Codec(T64, LZ4), "
+                            "value");
+            sqlQuery.append(type);
+            sqlQuery.append(" Codec(Gorilla, LZ4)) ");
+        }
+        else
+        {
+            sqlQuery.append(" (timestamp DateTime, "
+                            "paramId UInt16, "
+                            "value");
+            sqlQuery.append(type);
+            sqlQuery.append(") ");
+        }
+
         sqlQuery.append("ENGINE = MergeTree() "
                         "PARTITION BY toYYYYMM(timestamp) "
                         "ORDER BY timestamp");
@@ -101,7 +132,7 @@ void DbService::Reconnect()
     this->client->ResetConnection();
 }
 
-void DbService::InsertData(float data)
+void DbService::InsertData(float data, int dataType)
 {
     try
     {
@@ -112,11 +143,23 @@ void DbService::InsertData(float data)
         timestamp->Append(now);
         block.AppendColumn("timestamp", timestamp);
 
-        for (auto const &item : this->values)
+        if (dataType == 0)
         {
-            auto val = std::make_shared<ColumnFloat32>();
-            val->Append(data);
-            block.AppendColumn(item, val);
+            for (auto const &item : this->values)
+            {
+                auto val = std::make_shared<ColumnFloat32>();
+                val->Append(data);
+                block.AppendColumn(item, val);
+            }
+        }
+        else
+        {
+            for (auto const &item : this->values)
+            {
+                auto val = std::make_shared<ColumnString>();
+                val->Append(to_string(data));
+                block.AppendColumn(item, val);
+            }
         }
 
         client->Insert(this->dbName + "." + tableName, block);
@@ -132,7 +175,7 @@ void DbService::InsertData(float data)
     }
 }
 
-void DbService::InsertDataWithParamId(float data)
+void DbService::InsertDataWithParamId(float data, int dataType)
 {
     try
     {
@@ -141,18 +184,35 @@ void DbService::InsertDataWithParamId(float data)
         time_t now = time(0);
         auto timestamp = std::make_shared<ColumnDateTime>();
         auto paramId = std::make_shared<ColumnUInt16>();
-        auto val = std::make_shared<ColumnFloat32>();
 
-        for (int i = 0; i < paramsCount; i++)
+        if (dataType == 0)
         {
-            timestamp->Append(now);
-            paramId->Append(i);
-            val->Append(data);
-        }
+            auto val = std::make_shared<ColumnFloat32>();
 
-        block.AppendColumn("timestamp", timestamp);
-        block.AppendColumn("paramId", paramId);
-        block.AppendColumn("value", val);
+            for (int i = 0; i < paramsCount; i++)
+            {
+                timestamp->Append(now);
+                paramId->Append(i);
+                val->Append(data);
+            }
+            block.AppendColumn("timestamp", timestamp);
+            block.AppendColumn("paramId", paramId);
+            block.AppendColumn("value", val);
+        }
+        else
+        {
+            auto val = std::make_shared<ColumnString>();
+
+            for (int i = 0; i < paramsCount; i++)
+            {
+                timestamp->Append(now);
+                paramId->Append(i);
+                val->Append(to_string(data));
+            }
+            block.AppendColumn("timestamp", timestamp);
+            block.AppendColumn("paramId", paramId);
+            block.AppendColumn("value", val);
+        }
 
         client->Insert(this->dbName + "." + tableName, block);
 

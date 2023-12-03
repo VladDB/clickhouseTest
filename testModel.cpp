@@ -18,9 +18,9 @@ void TestModel::ConnectToDbAndCreateTable()
 
         // Create DB with params
         if (dbType == 0)
-            dbService->CreateTableAndColums();
+            dbService->CreateTableAndColums(this->useCompression, this->dataType);
         else
-            dbService->CreateTableAndColumsWithParamId();
+            dbService->CreateTableAndColumsWithParamId(this->useCompression, this->dataType);
     }
     catch (const std::exception &e)
     {
@@ -65,9 +65,9 @@ void TestModel::StartTesting()
             {
                 this->mtx.lock();
                 if (dbType == 0)
-                    this->dbService->InsertData(data);
+                    this->dbService->InsertData(data, this->dataType);
                 else
-                    this->dbService->InsertDataWithParamId(data);
+                    this->dbService->InsertDataWithParamId(data, this->dataType);
                 this->mtx.unlock();
             }
             catch (const std::exception &e)
@@ -145,7 +145,9 @@ string TestModel::ToStr()
     str.append("User: ").append(this->dbUser).append("\n");
     str.append("Password: ").append(this->dbPass).append("\n");
     str.append("Table name: ").append(this->dbTable).append("\n");
-    str.append("Type: ").append(this->dbType == 0 ? "Wide" : "Slim").append("\n");
+    str.append("Table type: ").append(this->dbType == 0 ? "Wide" : "Slim").append("\n");
+    str.append("Data type: ").append(this->dataType == 0 ? "Float" : "String").append("\n");
+    str.append("Use compression: ").append(this->useCompression == 1 ? "Yes" : "No").append("\n");
 
     str.append("\nTest settings\n");
     str.append("Data type: ").append(this->rndType == 0 ? "as sin" : "as saw").append("\n");
