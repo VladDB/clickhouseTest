@@ -53,19 +53,23 @@ void DbService::CreateTableAndColums(bool useCompression, int dataType)
         {
             sqlQuery.append(" val" + to_string(i));
             if (dataType == 0)
-                sqlQuery.append(" Float32");
+                sqlQuery.append(" Float64");
             else
-                sqlQuery.append(" String");
+                sqlQuery.append(" Int64");
             if (useCompression)
-                sqlQuery.append(" Codec(Gorilla, LZ4),");
-            else
-                sqlQuery.append(",");
+            {
+                if (dataType == 0)
+                    sqlQuery.append(" Codec(Gorilla, LZ4) ");
+                else
+                    sqlQuery.append(" Codec(T64, LZ4) ");
+            }
+            sqlQuery.append(",");
 
             // add for future request in db
             this->values.push_back("val" + to_string(i));
         }
         sqlQuery.append(") ENGINE = MergeTree() "
-                        "PARTITION BY toYYYYMM(timestamp) "
+                        "PARTITION BY toYYYYMMDD(timestamp) "
                         "ORDER BY timestamp");
 
         client->Execute(sqlQuery);
@@ -85,9 +89,9 @@ void DbService::CreateTableAndColumsWithParamId(bool useCompression, int dataTyp
 {
     string type;
     if (dataType == 0)
-        type = " Float32";
+        type = " Float64";
     else
-        type = " String";
+        type = " Int64";
 
     try
     {
@@ -99,7 +103,10 @@ void DbService::CreateTableAndColumsWithParamId(bool useCompression, int dataTyp
                             "paramId UInt16 Codec(T64, LZ4), "
                             "value");
             sqlQuery.append(type);
-            sqlQuery.append(" Codec(Gorilla, LZ4)) ");
+            if (dataType == 0)
+                sqlQuery.append(" Codec(Gorilla, LZ4)) ");
+            else
+                sqlQuery.append(" Codec(T64, LZ4)) ");
         }
         else
         {
@@ -111,7 +118,7 @@ void DbService::CreateTableAndColumsWithParamId(bool useCompression, int dataTyp
         }
 
         sqlQuery.append("ENGINE = MergeTree() "
-                        "PARTITION BY toYYYYMM(timestamp) "
+                        "PARTITION BY toYYYYMMDD(timestamp) "
                         "ORDER BY timestamp");
 
         client->Execute(sqlQuery);
@@ -132,7 +139,7 @@ void DbService::Reconnect()
     this->client->ResetConnection();
 }
 
-void DbService::InsertData(float data, int dataType)
+void DbService::InsertData(double data, int dataType)
 {
     try
     {
@@ -147,7 +154,7 @@ void DbService::InsertData(float data, int dataType)
         {
             for (auto const &item : this->values)
             {
-                auto val = std::make_shared<ColumnFloat32>();
+                auto val = std::make_shared<ColumnFloat64>();
                 val->Append(data);
                 block.AppendColumn(item, val);
             }
@@ -156,8 +163,8 @@ void DbService::InsertData(float data, int dataType)
         {
             for (auto const &item : this->values)
             {
-                auto val = std::make_shared<ColumnString>();
-                val->Append(to_string(data));
+                auto val = std::make_shared<ColumnInt64>();
+                val->Append((int64_t)data);
                 block.AppendColumn(item, val);
             }
         }
@@ -175,7 +182,7 @@ void DbService::InsertData(float data, int dataType)
     }
 }
 
-void DbService::InsertDataWithParamId(float data, int dataType)
+void DbService::InsertDataWithParamId(double data, int dataType)
 {
     try
     {
@@ -187,7 +194,7 @@ void DbService::InsertDataWithParamId(float data, int dataType)
 
         if (dataType == 0)
         {
-            auto val = std::make_shared<ColumnFloat32>();
+            auto val = std::make_shared<ColumnFloat64>();
 
             for (int i = 0; i < paramsCount; i++)
             {
@@ -201,13 +208,13 @@ void DbService::InsertDataWithParamId(float data, int dataType)
         }
         else
         {
-            auto val = std::make_shared<ColumnString>();
+            auto val = std::make_shared<ColumnInt64>();
 
             for (int i = 0; i < paramsCount; i++)
             {
                 timestamp->Append(now);
                 paramId->Append(i);
-                val->Append(to_string(data));
+                val->Append((int64_t)data);
             }
             block.AppendColumn("timestamp", timestamp);
             block.AppendColumn("paramId", paramId);

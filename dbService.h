@@ -25,8 +25,8 @@ public:
     void Reconnect();
     void CreateTableAndColums(bool useCompression, int dataType);
     void CreateTableAndColumsWithParamId(bool useCompression, int dataType);
-    void InsertData(float data, int dataType);
-    void InsertDataWithParamId(float data, int dataType);
+    void InsertData(double data, int dataType);
+    void InsertDataWithParamId(double data, int dataType);
     void DropDataBase();
     uint64_t GetRowsCount();
 };

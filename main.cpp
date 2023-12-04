@@ -98,7 +98,7 @@ int main(int, char **)
             ImGui::Text("Data type:");
             static int dbDataType = 0;
             ImGui::RadioButton("Float", &dbDataType, 0);
-            ImGui::RadioButton("String", &dbDataType, 1);
+            ImGui::RadioButton("Int", &dbDataType, 1);
 
             ImGui::Text("Use Compression:");
             static int compression = 0;

@@ -1,9 +1,9 @@
 #include "testModel.h"
 
-float TestModel::GenerateData()
+double TestModel::GenerateData()
 {
     time_t timer = time(0);
-    float tmp = this->ampl * sin(this->freq * timer);
+    double tmp = this->ampl * sin(this->freq * timer);
     this->mtx.unlock();
     return tmp;
 }
@@ -37,7 +37,7 @@ void TestModel::StartTesting()
     {
         // start generate and insert
         int counter = 10;
-        float data = 0;
+        double data = 0;
         bool needReconnect = false;
         while (!stopTh)
         {
@@ -146,7 +146,7 @@ string TestModel::ToStr()
     str.append("Password: ").append(this->dbPass).append("\n");
     str.append("Table name: ").append(this->dbTable).append("\n");
     str.append("Table type: ").append(this->dbType == 0 ? "Wide" : "Slim").append("\n");
-    str.append("Data type: ").append(this->dataType == 0 ? "Float" : "String").append("\n");
+    str.append("Data type: ").append(this->dataType == 0 ? "Float" : "Int").append("\n");
     str.append("Use compression: ").append(this->useCompression == 1 ? "Yes" : "No").append("\n");
 
     str.append("\nTest settings\n");

@@ -30,7 +30,7 @@ private:
     int ampl = 10;
     int freq = 100;
 
-    float GenerateData();
+    double GenerateData();
 
 public:
     bool prepareForTesting = false;
