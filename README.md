@@ -1,1 +1,2 @@
-Simple app for testing ClickHouse with GUI(ImGui) for linux
+## Simple app for testing ClickHouse with GUI(ImGui) for linux.
+Testing wide and slim table, with 1 second period insert any count of params of string or double data type. Data is generated as sin or raw (10 second insert the same value). You can create 10 testing threads. In the end of test you can drop the table.
