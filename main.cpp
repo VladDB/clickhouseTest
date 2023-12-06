@@ -24,6 +24,8 @@ int main(int, char **)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
+    glfwSwapInterval(1);
+
     // Create window with graphics context
     GLFWwindow *window = glfwCreateWindow(1920, 1080, "App for testing ClickHouse", nullptr, nullptr);
     if (window == nullptr)
@@ -64,7 +66,8 @@ int main(int, char **)
     // main loop
     while (!glfwWindowShouldClose(window))
     {
-        glfwPollEvents();
+        // glfwPollEvents();
+        glfwWaitEvents();
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();

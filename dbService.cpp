@@ -152,26 +152,26 @@ void DbService::InsertData(double data, int dataType)
 
         if (dataType == 0)
         {
-            for (auto const &item : this->values)
+            for (int i = 0; i < this->values.size(); i++)
             {
                 auto val = std::make_shared<ColumnFloat64>();
-                val->Append(data);
-                block.AppendColumn(item, val);
+                val->Append(data * i);
+                block.AppendColumn(this->values[i], val);
             }
         }
         else
         {
-            for (auto const &item : this->values)
+            for (int i = 0; i < this->values.size(); i++)
             {
                 auto val = std::make_shared<ColumnInt64>();
-                val->Append((int64_t)data);
-                block.AppendColumn(item, val);
+                val->Append((int64_t)(data * i));
+                block.AppendColumn(this->values[i], val);
             }
         }
 
         client->Insert(this->dbName + "." + tableName, block);
 
-        printf("Data was added with value: %f\n", data);
+        // printf("Data was added with value: %f\n", data);
         // allLog.push_back("Data was added with value: " + to_string(data));
     }
     catch (const std::exception &e)
@@ -200,7 +200,7 @@ void DbService::InsertDataWithParamId(double data, int dataType)
             {
                 timestamp->Append(now);
                 paramId->Append(i);
-                val->Append(data);
+                val->Append(data * i);
             }
             block.AppendColumn("timestamp", timestamp);
             block.AppendColumn("paramId", paramId);
@@ -214,7 +214,7 @@ void DbService::InsertDataWithParamId(double data, int dataType)
             {
                 timestamp->Append(now);
                 paramId->Append(i);
-                val->Append((int64_t)data);
+                val->Append((int64_t)(data * i));
             }
             block.AppendColumn("timestamp", timestamp);
             block.AppendColumn("paramId", paramId);
@@ -223,7 +223,7 @@ void DbService::InsertDataWithParamId(double data, int dataType)
 
         client->Insert(this->dbName + "." + tableName, block);
 
-        printf("Data was added with value: %f\n", data);
+        // printf("Data was added with value: %f\n", data);
         // allLog.push_back("Data was added with value: " + to_string(data));
     }
     catch (const std::exception &e)
